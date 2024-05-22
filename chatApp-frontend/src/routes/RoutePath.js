@@ -1,5 +1,5 @@
 const base = "/";
-const baseApiRoot = "http://localhost:5000" // local_host
+const baseApiRoot = "https://chat-mern-app-1lgm.onrender.com" // local_host
 // const baseApiRoot = "https://webwhatsapp.1clx.com" // domain_server_host
 const baseApi = baseApiRoot + "/api";
 const app = "/app";
