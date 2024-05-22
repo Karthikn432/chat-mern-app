@@ -29,10 +29,10 @@ const __dirname = path.resolve()
 // const __dirname = path.dirname(__filename);
 // app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
-app.use(cors({
-    credentials: true,
-    origin: "http://localhost:3000",
-}));
+// app.use(cors({
+//     credentials: true,
+//     origin: "http://localhost:3000",
+// }));
 // To Parse the incomming requests with JSON Payload from the body
 app.use(express.json());
 app.use(cookieParser()); 
