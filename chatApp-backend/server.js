@@ -31,7 +31,7 @@ const __dirname = path.resolve()
 
 app.use(cors({
     credentials: true,
-    origin: ["http://localhost:5000", "https://chat-mern-app-1lgm.onrender.com"],
+    origin:"https://chat-mern-app-1lgm.onrender.com",
 }));
 // To Parse the incomming requests with JSON Payload from the body
 app.use(express.json());

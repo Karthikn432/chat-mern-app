@@ -7,11 +7,11 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         credentials: true,
-        origin: "http://localhost:5000",
+        origin: "https://chat-mern-app-1lgm.onrender.com",
     }
 });
 
-export const getReceiverSocketId = (receiverId) =>{
+export const getReceiverSocketId = (receiverId) => {
     return userSocketMap[receiverId]
 }
 
