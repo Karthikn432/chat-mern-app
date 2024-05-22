@@ -5,7 +5,7 @@ import generateTokenAndSetCookie from "../utils/generateToken.js";
 export const signup = async (req, res) => {
     try {
         const { fullName, username, password, confirmPassword, gender } = req.body;
-
+        console.log({res : fullName, username, password, confirmPassword, gender})
         if (password !== confirmPassword) {
             return res.status(400).json({
                 error: "Password didn't Match "
@@ -69,6 +69,7 @@ export const login = async (req, res) => {
     try {
 
         const { username, password } = req.body;
+        console.log({sign : username, password })
         const user = await User.findOne({ username });
         const isPasswordCorrect = await bcrypt.compare(password, user?.password || "")
 
