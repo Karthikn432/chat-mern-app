@@ -14,7 +14,7 @@ const Messages = () => {
         skip : !chatContactsData,
       });
       useListenMessages({messages, setMessages});
-      console.log({messages})
+
       useEffect(() => {
         if (getSelectedUserMessages) {
           setMessages(getSelectedUserMessages);
@@ -27,7 +27,6 @@ const Messages = () => {
             lastMsgRef.current.scrollIntoView({behavior : "smooth"})
         },100)
       }, [messages])
-      console.log({messages})
 
     if(isLoading){
         return (

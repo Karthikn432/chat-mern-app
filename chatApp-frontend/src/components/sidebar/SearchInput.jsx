@@ -11,8 +11,6 @@ const SearchInput = ({ setSearchTerm }) => {
    
   }
 
-  // const conversation = 
-
   return (
     <form className='' onSubmit={handleSubmit}>
       <div className='flex items-center gap-2'>

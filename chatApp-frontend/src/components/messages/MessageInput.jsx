@@ -14,7 +14,6 @@ const MessageInput = () => {
     try {
       const result = await sendMessage({ message: data.message, id: chatSelectedData.id })
       if (result.data) {
-        console.log({ out: result.data })
         reset()
       } else {
         console.log({ error: result.error })

@@ -54,10 +54,8 @@ export const sendMessage = async (req, res) => {
 
 export const getMessage = async (req, res) => {
     try {
-        console.log('first')
         const { id: userToChatId } = req.params;
         const senderId = req.user._id;
-        console.log({ userToChatId, senderId })
         const conversation = await Conversation.findOne({
             participants: { $all: [senderId, userToChatId] }
         }).populate("messages"); //Not Reference But actual Messages
