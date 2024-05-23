@@ -9,10 +9,10 @@ export const getUsersForSidebars = async (req, res) => {
         const loggedInUserId = req.user._id
         console.log({loggedInUserId})
         const query = { _id: { $ne: loggedInUserId } };
-        if (searchTerm) {
-            // Use a case-insensitive regular expression for searching names
-            query.fullName = { $regex: new RegExp(searchTerm, 'i') };
-        }
+        // if (searchTerm) {
+        //     // Use a case-insensitive regular expression for searching names
+        //     query.fullName = { $regex: new RegExp(searchTerm, 'i') };
+        // }
         // const totalCount = await User.countDocuments(query);
         // const pageCount = Math.ceil(totalCount / perPage);
 
