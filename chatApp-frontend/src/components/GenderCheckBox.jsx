@@ -1,21 +1,20 @@
 import React from 'react'
 import { Controller } from 'react-hook-form'
 
-const GenderCheckBox = ({ register, errors,control }) => {
+const GenderCheckBox = ({ register, errors, control }) => {
 
-    const GenderOptions = [
-        {
-            name: "Male",
-            value: "male"
-        },
-        {
-            name: "Female",
-            value: "female"
-
-        }
-    ]
-    return (
-        <div className="flex">
+  const GenderOptions = [
+    {
+      name: "Male",
+      value: "male"
+    },
+    {
+      name: "Female",
+      value: "female"
+    }
+  ]
+  return (
+    <div className="flex">
       {GenderOptions.map((option, idx) => (
         <div className="form-control" key={idx}>
           <Controller
@@ -41,7 +40,7 @@ const GenderCheckBox = ({ register, errors,control }) => {
         <p className="text-red-500 text-start ps-5 p-1">{errors.gender.message}</p>
       )}
     </div>
-    )
+  )
 }
 
 export default GenderCheckBox
