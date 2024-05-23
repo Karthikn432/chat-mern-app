@@ -31,7 +31,7 @@ const __dirname = path.resolve()
 
 // Configure CORS
 const allowedOrigins = [
-    "http://localhost:5000", 
+    "http://localhost:3000", 
     "https://chat-mern-app-1lgm.onrender.com"
 ];
 
