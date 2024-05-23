@@ -1,10 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit"
 
-const initialState = {
+const getSelectedUser = JSON.parse(localStorage.getItem("selected_conversation"))
+
+const initialState =getSelectedUser ? getSelectedUser : {
     id : "",
     name : "", 
     profile : "", 
 }
+console.log({initialState})
 
 const chatSlice = createSlice({
     name:'whatsappSendContacts',
