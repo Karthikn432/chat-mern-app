@@ -15,7 +15,7 @@ const Conversation = ({ name, profile, id, isLastIdx, selectedConversation, setS
 
     return (
         <>
-            <div className={`flex gap-2 items-center hover:bg-yellow-500 rounded p-2 py-1 cursor-pointer ${getSelectedUser.id === id ? "bg-sky-500" : ""}`} onClick={() => handleSelectChatUser(id, name, profile)}>
+            <div className={`flex gap-2 items-center hover:bg-yellow-500 rounded p-2 py-1 cursor-pointer ${getSelectedUser?.id === id ? "bg-sky-500" : ""}`} onClick={() => handleSelectChatUser(id, name, profile)}>
                 <div className={`avatar ${isOnline ? "online" : "offline"}`}>
                     <div className="w-12 rounded-full">
                         <img src={profile ? profile : "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"} alt="user avatar" />
