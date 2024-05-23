@@ -6,11 +6,11 @@ export const usersQueryApi = rootApi.injectEndpoints({
 
         getConversationUsers: builder.query({
             query: (args) => {
-                const { search, page, per_page } = args
+                // const { search, page, per_page } = args
                 return {
                     url: routesApi.app.users,  //userGeneratePasword end point
                     method: "GET",
-                    params: { search, page, per_page }
+                    // params: { search, page, per_page }
                 }
             },
             providesTags: ['Users'],
