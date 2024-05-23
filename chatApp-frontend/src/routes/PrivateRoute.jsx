@@ -5,7 +5,6 @@ import { routePath } from "./RoutePath";
 
 const PrivateRoute = ({ children }) => {
     const { authUser } = useAuthContext();
-    console.log({authUser})
     if (!authUser) {
         return <Navigate to={routePath.auth.login} />;
     }

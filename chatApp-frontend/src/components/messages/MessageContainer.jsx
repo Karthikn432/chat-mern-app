@@ -7,7 +7,6 @@ import { useAuthContext } from '../../context/AuthContext'
 
 const MessageContainer = () => {
     const chatContactsData = useSelector(state => state.chatContactsData)
-    console.log({chatContactsData})
     return (
         <div className="flex flex-col md:min-w-[500px]">
             {
