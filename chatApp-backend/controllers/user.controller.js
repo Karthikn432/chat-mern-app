@@ -6,6 +6,7 @@ export const getUsersForSidebars = async (req, res) => {
     // const searchTerm = req.query.search || '';
 
     try {
+        console.log({req})
         const loggedInUserId = req.user._id
         console.log({loggedInUserId})
         const query = { _id: { $ne: loggedInUserId } };
