@@ -12,8 +12,8 @@ const Conversations = ({searchTerm}) => {
         page: "",
         per_page: "",
       });
-
-    const [selectedConversation, setSelectedConversation] = useState(null)
+    const getLocalSelectedData = localStorage.getItem("selected_conversation")
+    const [selectedConversation, setSelectedConversation] = useState(getLocalSelectedData || null)
 
     if (isLoading) {
         return <div>Loading</div>
