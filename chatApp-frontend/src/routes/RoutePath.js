@@ -1,6 +1,5 @@
 const base = "/";
-const baseApiRoot = "https://chat-mern-app-1lgm.onrender.com" // local_host
-// const baseApiRoot = "https://webwhatsapp.1clx.com" // domain_server_host
+const baseApiRoot = "https://chat-mern-app-1lgm.onrender.com" // "http://localhost:5000" //
 const baseApi = baseApiRoot + "/api";
 const app = "/app";
 
@@ -14,6 +13,7 @@ export const routePath = {
   },
   app: {
     mainPage: app,
+    messages: app + "messages"
   }
 }
 
@@ -29,7 +29,7 @@ export const routesApi = {
   app: {
    users : baseApi + "/users",
    getMessages : baseApi + "/messages",
-   sendMessage : baseApi + "/messages/send"
-
+   sendMessage : baseApi + "/messages/send",
+   getLastMessageTime : baseApi + "/messages/lastseen"
   }
 };

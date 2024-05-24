@@ -8,6 +8,7 @@ import NotFound from "../screens/unAuthorize/NotFound";
 import Register from "../screens/auth/Register";
 import Home from "../screens/app/Home";
 import PrivateRoute from "./PrivateRoute";
+import MobileMesage from "../screens/app/MobileMesage";
 
 
 const AppRoutes = () => {
@@ -22,6 +23,7 @@ const AppRoutes = () => {
             {/* App Routes start */}
             <Route path={routePath.home} element={<PrivateRoute><AppLayout /></PrivateRoute>}>
                 <Route path={`${routePath.app.mainPage}`} element={<Suspense fallback={null}><Home /></Suspense>} />
+                <Route path={`${routePath.app.messages}`} element={<Suspense fallback={null}><MobileMesage /></Suspense>} />
             </Route>
             {/* Invalid Route */}
             <Route path='*' element={<Suspense fallback={null}><NotFound /></Suspense>} />

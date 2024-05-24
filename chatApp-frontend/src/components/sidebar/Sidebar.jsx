@@ -11,7 +11,7 @@ const Sidebar = () => {
 
   
   return (
-    <div className='border-r border-slate-500 p-4 flex flex-col'>
+    <div className='border-r border-slate-500 p-4 flex flex-col min-w-[320px] w-full'>
       <SearchInput setSearchTerm={setSearchTerm} searchTerm={searchTerm}/>
       <div className="divider px-3"></div>
       <Conversations searchTerm={searchTerm} />

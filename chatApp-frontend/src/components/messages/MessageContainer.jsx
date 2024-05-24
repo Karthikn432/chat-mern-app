@@ -2,20 +2,33 @@ import React from 'react'
 import Messages from './Messages'
 import MessageInput from './MessageInput'
 import { TiMessages } from 'react-icons/ti'
-import {useSelector } from 'react-redux'
+import {useDispatch, useSelector } from 'react-redux'
 import { useAuthContext } from '../../context/AuthContext'
+import { IoArrowBackCircleSharp } from 'react-icons/io5'
+import { resetSelectedChatUser } from '../../features/slice/chatSlice'
 
 const MessageContainer = () => {
     const chatContactsData = useSelector(state => state.chatContactsData)
+    const dispatch = useDispatch()
+    const handleBackConversation = async() =>{
+        await dispatch(resetSelectedChatUser())
+        console.log('called')
+        localStorage.removeItem('selected_conversation')
+    }
+    console.log({chatContactsData})
     return (
-        <div className="flex flex-col md:min-w-[500px]">
+        <div className="flex flex-col justify-center w-full">
             {
                 !chatContactsData.id ? (<NoChatSelected />) : (
                     <>
                         {/* Header */}
-                        <div className="bg-slate-500 px-4 py-2 mb-2">
+                        <div className="bg-slate-500 px-4 py-3 mb-2 flex items-center gap-4">
                             {/* <span className="label-text">To:</span> */}
-                            <span className="text-gray-900 font-bold capitalize ">{chatContactsData?.name}</span>
+                            <span onClick={handleBackConversation}>
+                            <IoArrowBackCircleSharp className='flex md:hidden w-8 h-8 text-white cursor-pointer hover:text-black'/>
+                            </span>
+                            <img src={chatContactsData.profile} alt="" className='w-10 h-10' />
+                            <span className="text-gray-900 font-bold capitalize text-white">{chatContactsData?.name}</span>
                         </div>
                         {/* Messages */}
                         <Messages />
