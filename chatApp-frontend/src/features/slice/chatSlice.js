@@ -6,6 +6,7 @@ const initialState =getSelectedUser ? getSelectedUser : {
     id : "",
     name : "", 
     profile : "", 
+    lastMsgDate : ""
 }
 console.log({initialState})
 
@@ -18,11 +19,14 @@ const chatSlice = createSlice({
             state.name = action.payload.name;
             state.profile = action.payload.profile;
         },
-        resetFilterContacts:() => {
+        updateLastMessage : (state, action) => {
+            state.lastMsgDate = action.payload.lastMsgDate;
+        },
+        resetSelectedChatUser:() => {
             return initialState
         }
     }
 })
 
-export const {getSelectedChatUser,resetFilterContacts} = chatSlice.actions;
+export const {getSelectedChatUser,updateLastMessage, resetSelectedChatUser} = chatSlice.actions;
 export default chatSlice.reducer;

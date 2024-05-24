@@ -8,7 +8,7 @@ export default defineConfig({
     port : 3000,
     proxy : {
       "/api":{
-        target : "https://chat-mern-app-1lgm.onrender.com"
+        target : "https://chat-mern-app-1lgm.onrender.com" // "http://localhost:5000" //
       }
     }
   }

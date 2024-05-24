@@ -16,6 +16,15 @@ export const usersQueryApi = rootApi.injectEndpoints({
             providesTags: ['Users'],
         }),
 
+        getLastMessageTime: builder.query({
+            query: (id) => ({
+                // const params = new URLSearchParams({ id }).toString();
+                url: `${routesApi.app.getLastMessageTime}/${id}`,  //userGeneratePasword end point
+                params: { id },
+                method: "GET",
+            }),
+        }),
+
         getSelectedUserMessages: builder.query({
             query: (id) => ({
                 // const params = new URLSearchParams({ id }).toString();
@@ -31,7 +40,7 @@ export const usersQueryApi = rootApi.injectEndpoints({
                 method: "POST",
                 body: { message },
             }),
-            invalidatesTags : ['Messages'],
+            invalidatesTags: ['Messages'],
         }),
 
     })
@@ -41,4 +50,5 @@ export const {
     useGetConversationUsersQuery,
     useGetSelectedUserMessagesQuery,
     useLazyGetSelectedUserMessagesQuery,
-    useSendMessageMutation } = usersQueryApi;
+    useSendMessageMutation,
+    useGetLastMessageTimeQuery } = usersQueryApi;

@@ -70,3 +70,26 @@ export const getMessage = async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" })
     }
 }
+
+export const getLastMessageTime = async (req, res) => {
+    try {
+        const { id: userToChatId } = req.params;
+        const senderId = req.user._id;
+
+        const lastMessage = await Message.findOne({
+            $or: [
+                { senderId: senderId, receiverId: userToChatId },
+                { senderId: userToChatId, receiverId: senderId }
+            ]
+        }).sort({ createdAt: -1 }); // Sort by createdAt in descending order
+
+        if (!lastMessage) {
+            return res.status(404).json({ message: "No messages found between the users" });
+        }
+
+        res.status(200).json({ lastMessageTime: lastMessage.createdAt });
+    } catch (error) {
+        console.log("Error in getLastMessageTime controller", error.message);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
