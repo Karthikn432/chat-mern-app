@@ -24,13 +24,13 @@ const Messages = () => {
 
       useEffect(()=>{
         setTimeout(()=> {
-            lastMsgRef.current.scrollIntoView({behavior : "smooth"})
+            lastMsgRef?.current?.scrollIntoView({behavior : "smooth"})
         },100)
       }, [messages])
 
     if(isLoading){
         return (
-            <div className='px-4 flex-1 overflow-auto'>
+            <div className='px-8 md:px-16 lg:px-32 xl:px-64 flex-1 overflow-auto'>
                 {isLoading && [...Array(3)].map((_, idx) => <MessageSkeleton key={idx}/>)}
             </div>
         )
@@ -38,7 +38,7 @@ const Messages = () => {
 
 
     return (
-        <div className="px-4 flex-1 overflow-auto">
+        <div className={`px-8 mt-6 md:px-16 lg:px-32 xl:px-64 flex-1 overflow-auto`}>
            {
             messages?.length ? (
                 messages?.map((chat, idx)=>(

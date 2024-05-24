@@ -19,7 +19,7 @@ const LogoutButton = () => {
     }
   }
   return (
-    <div className='mt-auto'>
+    <div className='flex mt-auto'>
       <div className="hover:bg-white text-white hover:text-gray-800 rounded-full p-2 w-10 h-10 cursor-pointer "  onClick={handleLogout} >
         <CiLogout className="w-6 h-6"/>
       </div>
