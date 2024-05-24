@@ -17,7 +17,7 @@ const MessageContainer = () => {
     }
     console.log({chatContactsData})
     return (
-        <div className="flex flex-col justify-center w-full">
+        <div className="flex flex-col justify-center w-full h-screen">
             {
                 !chatContactsData.id ? (<NoChatSelected />) : (
                     <>
