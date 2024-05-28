@@ -34,12 +34,36 @@ export const usersQueryApi = rootApi.injectEndpoints({
             }),
             providesTags: ['Messages'],
         }),
+
         sendMessage: builder.mutation({
-            query: ({ id, message }) => ({
-                url: `${routesApi.app.sendMessage}/${id}`,  //signin end point
-                method: "POST",
-                body: { message },
-            }),
+            query: (args) => {
+                const { id, message, fileUrl } = args;
+                console.log({message})
+                return {
+                    url: `${routesApi.app.sendMessage}/${id}`,  //signin end point
+                    method: "POST",
+                    body: { message, fileUrl },
+                }
+            },
+            invalidatesTags: ["Messages"]
+        }),
+
+        fileUpload: builder.mutation({
+            // query: ({formData, id}) => ({
+            //     url: `${routesApi.app.uploadFile}/${id}`,  //signin end point
+            //     method: "POST",
+            //     body: {formData},
+            // }),
+            query: (args) => {
+                const { fileMetadata, id } = args
+                console.log({ fileMetadata, id })
+                return {
+                    url: `${routesApi.app.uploadFile}/${id}`,
+                    method: "POST",
+                    params: { id },
+                    body: { fileMetadata, id },
+                }
+            },
             invalidatesTags: ['Messages'],
         }),
 
@@ -51,4 +75,5 @@ export const {
     useGetSelectedUserMessagesQuery,
     useLazyGetSelectedUserMessagesQuery,
     useSendMessageMutation,
-    useGetLastMessageTimeQuery } = usersQueryApi;
+    useGetLastMessageTimeQuery,
+    useFileUploadMutation } = usersQueryApi;

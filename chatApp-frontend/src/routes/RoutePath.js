@@ -1,5 +1,5 @@
 const base = "/";
-const baseApiRoot = "https://chat-mern-app-1lgm.onrender.com" // "http://localhost:5000" //
+const baseApiRoot = "https://chat-mern-app-1lgm.onrender.com" // "http://localhost:5000" // 
 const baseApi = baseApiRoot + "/api";
 const app = "/app";
 
@@ -30,6 +30,7 @@ export const routesApi = {
    users : baseApi + "/users",
    getMessages : baseApi + "/messages",
    sendMessage : baseApi + "/messages/send",
+   uploadFile : baseApi + "/messages/upload_file",
    getLastMessageTime : baseApi + "/messages/lastseen"
   }
 };
