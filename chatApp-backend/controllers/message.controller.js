@@ -1,13 +1,15 @@
+import path from "path";
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
+import fs from 'fs'
+const __dirname = path.resolve()
 
 export const sendMessage = async (req, res) => {
     try {
-        const { message } = req.body;
+        const { message, fileUrl } = req.body;
         const { id: receiverId } = req.params;
         const senderId = req.user._id;
-
         let conversation = await Conversation.findOne({
             participants: { $all: [senderId, receiverId] }
         })
@@ -18,30 +20,35 @@ export const sendMessage = async (req, res) => {
             })
         }
 
-        const newMessage = new Message({
+        const newMessageData = {
             senderId,
             receiverId,
-            message
-        })
+            message: message
+        };
 
+        if (fileUrl.path) {
+            newMessageData.filepath = {
+                path: fileUrl.path,
+                type: fileUrl.type
+            };
+        }
+
+        const newMessage = new Message(newMessageData);
+
+        console.log({newMessage})
         if (newMessage) {
             conversation.messages.push(newMessage._id)
         }
 
-        // await conversation.save();
-        // await newMessage.save()
-        // this will run in parallel instead above 2 await
         await Promise.all([conversation.save(), newMessage.save()])
 
         // SOCKET IO Functionality will Go Here
 
         const receiverSocketId = getReceiverSocketId(receiverId);
-        const senderSocketId = getReceiverSocketId(senderId);
+        // const senderSocketId = getReceiverSocketId(senderId);
         if (receiverSocketId) {
-            io.to(senderSocketId).emit("newMessage", newMessage)
-            //io.to(<socket_id>).emit() used to send events to specific client
+            // io.to(senderSocketId).emit("newMessage", newMessage)
             io.to(receiverSocketId).emit("newMessage", newMessage)
-
         }
 
         res.status(201).json(newMessage)
@@ -92,4 +99,68 @@ export const getLastMessageTime = async (req, res) => {
         console.log("Error in getLastMessageTime controller", error.message);
         res.status(500).json({ error: "Internal Server Error" });
     }
+};
+
+export const uploadFiles = async (req, res, next) => {
+    try {
+        const { id: uploaderId } = await req.params;
+        const { fileMetadata } = await req.body;
+        console.log({fileMetadata})
+        if (fileMetadata.fileDataURL) {
+            console.log('file')
+            const fileExtension = path.extname(fileMetadata.name);
+            const uniqueFileName = `${Date.now()}-${Math.floor(Math.random() * 1000)}${fileExtension}`;
+            const filePath = path.join(__dirname, 'chatApp-backend', 'uploads', uploaderId, uniqueFileName);
+            console.log({ filePath })
+            if (!fs.existsSync(path.dirname(filePath))) {
+                fs.mkdirSync(path.dirname(filePath), { recursive: true });
+            }
+
+            // Decode the base64 content using the appropriate encoding (e.g., 'base64')
+            const decodedContent = Buffer.from(fileMetadata.fileDataURL, 'base64');
+            // Write the file to the server
+            fs.writeFileSync(filePath, decodedContent);
+
+            return res.status(201).json({
+                success: true,
+                file_path: `uploads/${uploaderId}/` + uniqueFileName,
+                type : fileMetadata.type,
+                message: "uploaded successfully",
+            });
+
+
+        }
+    } catch (error) {
+        console.log({ error })
+    }
+    // if (file) {
+    //     const fileExtension = path.extname(fileMetadata.name);
+
+    //     const uniqueFileName = `${Date.now()}-${Math.floor(Math.random() * 1000)}${fileExtension}`;
+
+    //     // Define the full path where the file will be stored on the server
+    //     const filePath = path.join(__dirname, '..', 'uploads', documentType, senderId, uniqueFileName);
+
+    //     if (!fs.existsSync(path.dirname(filePath))) {
+    //         fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    //     }
+
+    //     // Decode the base64 content using the appropriate encoding (e.g., 'base64')
+    //     const decodedContent = Buffer.from(fileMetadata.fileDataURL, 'base64');
+
+    //     // Write the file to the server
+    //     fs.writeFileSync(filePath, decodedContent);
+
+    //     if (documentType == "chatUploadFile") {
+    //         return filePath;
+    //     }
+    //     else {
+    //         return res.status(201).json({
+    //             success: true,
+    //             file_path: `./uploads/chatMediaFile/${senderId}/` + uniqueFileName,
+    //             message: "uploaded successfully",
+    //         });
+    //     }
+
+    // }
 };
