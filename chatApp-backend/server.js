@@ -17,6 +17,7 @@ import connectToMongoDB from "./db/connectToMongoDB.js";
 import { fileURLToPath } from "url";
 import { app, server } from "./socket/socket.js";
 
+app.use(express.json({ limit: '30mb' }));
 
 // const app = express();
 const PORT = process.env.PORT || 5000
@@ -32,6 +33,7 @@ const __dirname = path.resolve()
 // Configure CORS
 const allowedOrigins = [
     "http://localhost:3000", 
+    "http://localhost:5000", 
     "https://chat-mern-app-1lgm.onrender.com"
 ];
 
@@ -56,8 +58,8 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes)
 app.use("/api/messages", messageRoutes)
 app.use("/api/users", userRoutes)
-
-
+app.use('/api/uploads', express.static(path.join(__dirname,"chatApp-backend",'uploads')))
+console.log({__dirname})
 app.use(express.static(path.join(__dirname,"chatApp-frontend/dist")));
 
 app.get("*",(req, res) => {

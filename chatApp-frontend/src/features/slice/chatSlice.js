@@ -22,8 +22,11 @@ const chatSlice = createSlice({
         updateLastMessage : (state, action) => {
             state.lastMsgDate = action.payload.lastMsgDate;
         },
-        resetSelectedChatUser:() => {
-            return initialState
+        resetSelectedChatUser:(state) => {
+            state.id = '';
+            state.name = '';
+            state.profile = ''; 
+            state.lastMsgDate = ''
         }
     }
 })

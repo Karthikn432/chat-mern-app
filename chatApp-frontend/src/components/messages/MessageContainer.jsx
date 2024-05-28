@@ -11,9 +11,8 @@ const MessageContainer = () => {
     const chatContactsData = useSelector(state => state.chatContactsData)
     const dispatch = useDispatch()
     const handleBackConversation = async() =>{
+        await localStorage.removeItem('selected_conversation')
         await dispatch(resetSelectedChatUser())
-        console.log('called')
-        localStorage.removeItem('selected_conversation')
     }
     console.log({chatContactsData})
     return (
@@ -22,7 +21,7 @@ const MessageContainer = () => {
                 !chatContactsData.id ? (<NoChatSelected />) : (
                     <>
                         {/* Header */}
-                        <div className="bg-slate-500 px-4 py-3 mb-2 flex items-center gap-4">
+                        <div className="bg-slate-500 w-full px-4 py-3 mb-2 flex items-center gap-4">
                             {/* <span className="label-text">To:</span> */}
                             <span onClick={handleBackConversation}>
                             <IoArrowBackCircleSharp className='flex md:hidden w-8 h-8 text-white cursor-pointer hover:text-black'/>
