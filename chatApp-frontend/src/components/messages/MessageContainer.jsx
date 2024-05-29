@@ -14,7 +14,6 @@ const MessageContainer = () => {
         await localStorage.removeItem('selected_conversation')
         await dispatch(resetSelectedChatUser())
     }
-    console.log({chatContactsData})
     return (
         <div className="flex flex-col justify-center w-full h-screen">
             {
@@ -27,7 +26,7 @@ const MessageContainer = () => {
                             <IoArrowBackCircleSharp className='flex md:hidden w-8 h-8 text-white cursor-pointer hover:text-black'/>
                             </span>
                             <img src={chatContactsData.profile} alt="" className='w-10 h-10' />
-                            <span className="text-gray-900 font-bold capitalize text-white">{chatContactsData?.name}</span>
+                            <span className="font-bold capitalize text-white">{chatContactsData?.name}</span>
                         </div>
                         {/* Messages */}
                         <Messages />

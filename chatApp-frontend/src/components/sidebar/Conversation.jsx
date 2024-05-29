@@ -12,7 +12,6 @@ const Conversation = ({ name, profile, id, isLastIdx, selectedConversation, setS
     const navigate = useNavigate()
     const getSelectedUser = JSON.parse(localStorage.getItem("selected_conversation"))
     const {data:getLastSeen} = useGetLastMessageTimeQuery(id)
-    console.log({getLastSeen})
     const handleSelectChatUser = async (id, name, profile) => {
         setSelectedConversation(id)
         dispatch(getSelectedChatUser({ id, name, profile }))
