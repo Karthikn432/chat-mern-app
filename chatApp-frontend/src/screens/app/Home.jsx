@@ -19,12 +19,10 @@ const Home = () => {
       navigate(routePath.auth.login)
     }
   }, [authUser])
-  useEffect(()=>{
-    console.log('first')
-  },[chatContactsData])
+
   return (
     <div className="flex w-full rounded-lg shadow-md bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0 ">
-      <div className={`${chatContactsData.id && isMediumScreenOrSmaller ? "hidden" : "flex"} `}>
+      <div className={`${chatContactsData.id && isMediumScreenOrSmaller ? "hidden" : "flex"} w-full md:w-auto `}>
         <Sidebar />
       </div>
       <div className={`${chatContactsData.id && isMediumScreenOrSmaller ? "flex" : "hidden"} sm:flex w-full`} >

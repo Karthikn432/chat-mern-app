@@ -49,23 +49,18 @@ export const usersQueryApi = rootApi.injectEndpoints({
         }),
 
         fileUpload: builder.mutation({
-            // query: ({formData, id}) => ({
-            //     url: `${routesApi.app.uploadFile}/${id}`,  //signin end point
-            //     method: "POST",
-            //     body: {formData},
-            // }),
             query: (args) => {
-                const { fileMetadata, id } = args
-                console.log({ fileMetadata, id })
+                console.log({args})
+                const {fileMetaData, id} = args
                 return {
-                    url: `${routesApi.app.uploadFile}/${id}`,
+                    url: `${routesApi.app.uploadFile}/${args.id}`,
                     method: "POST",
-                    params: { id },
-                    body: { fileMetadata, id },
-                }
+                    body: { fileMetaData : args.fileMetaData },
+                };
             },
             invalidatesTags: ['Messages'],
         }),
+        
 
     })
 })

@@ -1,13 +1,15 @@
-import React from 'react'
+import {routesApi } from '../../routes/RoutePath';
 
 const RenderFileContent = (filepath) => {
-    const fetchPath = "https://chat-mern-app-1lgm.onrender.com/api" // "http://localhost:5000/api" //
+    const fetchPath = routesApi.app.getFilesFromServer //"https://chat-mern-app-1lgm.onrender.com/api"// "http://localhost:5000/api" //
 
     if (!filepath.type) return null;
 
     const { path, type } = filepath;
-    console.log(type)
+
+
     switch (type) {
+        
         case 'image/png':
         case 'image/jpeg':
         case 'image/svg+xml':
