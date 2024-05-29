@@ -104,11 +104,11 @@ export const getLastMessageTime = async (req, res) => {
 export const uploadFiles = async (req, res, next) => {
     try {
         const { id: uploaderId } = await req.params;
-        const { fileMetadata } = await req.body;
-        console.log({fileMetadata})
-        if (fileMetadata.fileDataURL) {
+        const { fileMetaData } = await req.body;
+        console.log({fileMetaData})
+        if (fileMetaData.fileDataURL) {
             console.log('file')
-            const fileExtension = path.extname(fileMetadata.name);
+            const fileExtension = path.extname(fileMetaData.name);
             const uniqueFileName = `${Date.now()}-${Math.floor(Math.random() * 1000)}${fileExtension}`;
             const filePath = path.join(__dirname, 'chatApp-backend', 'uploads', uploaderId, uniqueFileName);
             console.log({ filePath })
@@ -117,24 +117,22 @@ export const uploadFiles = async (req, res, next) => {
             }
 
             // Decode the base64 content using the appropriate encoding (e.g., 'base64')
-            const decodedContent = Buffer.from(fileMetadata.fileDataURL, 'base64');
+            const decodedContent = Buffer.from(fileMetaData.fileDataURL, 'base64');
             // Write the file to the server
             fs.writeFileSync(filePath, decodedContent);
 
             return res.status(201).json({
                 success: true,
                 file_path: `uploads/${uploaderId}/` + uniqueFileName,
-                type : fileMetadata.type,
+                type : fileMetaData.type,
                 message: "uploaded successfully",
             });
-
-
         }
     } catch (error) {
         console.log({ error })
     }
     // if (file) {
-    //     const fileExtension = path.extname(fileMetadata.name);
+    //     const fileExtension = path.extname(fileMetaData.name);
 
     //     const uniqueFileName = `${Date.now()}-${Math.floor(Math.random() * 1000)}${fileExtension}`;
 
@@ -146,7 +144,7 @@ export const uploadFiles = async (req, res, next) => {
     //     }
 
     //     // Decode the base64 content using the appropriate encoding (e.g., 'base64')
-    //     const decodedContent = Buffer.from(fileMetadata.fileDataURL, 'base64');
+    //     const decodedContent = Buffer.from(fileMetaData.fileDataURL, 'base64');
 
     //     // Write the file to the server
     //     fs.writeFileSync(filePath, decodedContent);

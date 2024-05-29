@@ -8,7 +8,6 @@ const Message = ({ chat }) => {
     const { authUser } = useAuthContext();
     const chatContactsData = useSelector(state => state.chatContactsData)
     const fromMe = chat.senderId === authUser._id;
-    console.log({ chat })
     // CSS Style CLass change
     const chatClassName = fromMe ? "chat-end" : "chat-start"
     const profilePic = fromMe ? authUser.profilePic : chatContactsData.profile
