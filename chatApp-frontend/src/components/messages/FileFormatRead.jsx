@@ -1,28 +1,20 @@
-import { IoFileTray, IoImage, IoMusicalNote, IoPlay, IoText, IoVideocam } from 'react-icons/io5';
+import { IoDocumentText, IoFileTray, IoFileTrayStacked, IoImage, IoMusicalNote, IoPlay, IoText, IoVideocam } from 'react-icons/io5';
 import { routesApi } from '../../routes/RoutePath';
 
-const FileFormatRead = (fileMetaData) => {
-    console.log({fileMetaData})
-    // const { name,
-    //     size,
-    //     fileDataURL,
-    //     type } = fileMetaData;
-    console.log({type :fileMetaData?.type})
+const FileFormatRead = (type) => {
+    const fileType = type.split('/')[0];
+    switch (fileType) {
 
-    switch (fileMetaData?.type) {
-
-        case 'image/png':
-        case 'image/jpeg':
-        case 'image/svg+xml':
+        case 'image':
             return <IoImage className='w-10 h-14 text-red-500' />;
-        case 'video/mp4':
+        case 'video':
             return <IoPlay className='w-10 h-14 text-red-500 ' />;
-        case 'audio/mpeg':
+        case 'audio':
             return <IoMusicalNote className='w-10 h-14 text-red-500' />;
-        case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-            return <IoFileTray className='w-10 h-14 text-red-500' />;;
-        case 'text/plain':
-            return <IoText className='w-10 h-14 text-red-500' />;
+        case 'application':
+            return <IoDocumentText className='w-10 h-10 text-gray-600' />;;
+        case 'text':
+            return <IoDocumentText className='w-10 h-14 text-red-300' />;
         default:
             return <IoImage className='w-10 h-14 text-red-500' />;
     }

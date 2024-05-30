@@ -3,6 +3,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
 import path from 'path';
 import cors from "cors"
 // import { fileURLToPath } from 'url';
@@ -17,7 +18,8 @@ import connectToMongoDB from "./db/connectToMongoDB.js";
 import { fileURLToPath } from "url";
 import { app, server } from "./socket/socket.js";
 
-app.use(express.json({ limit: '30mb' }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // const app = express();
 const PORT = process.env.PORT || 5000

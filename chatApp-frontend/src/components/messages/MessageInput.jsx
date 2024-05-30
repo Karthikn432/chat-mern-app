@@ -17,7 +17,7 @@ const MessageInput = () => {
   const [fileMetaInfo, setFileMetaInfo] = useState({
     name: "",
     size: "",
-    fileDataURL: "",
+    path: "",
     type: ""
   })
   const [sendMessage, { error, isLoading, isSuccess }] = useSendMessageMutation();
@@ -25,12 +25,6 @@ const MessageInput = () => {
   const [fileUploadLoading, setFileUploadLoading] = useState(false)
   const [isOpenFileAttach, setIsOpenFileAttach] = useState(false)
   const fileAttachRef = useRef(null);
-
-
-  const [fileUrl, setFileUrl] = useState({
-    path: null,
-    type: null
-  });
 
   const handleUpload = () => {
     setIsOpenFileAttach(preve => !preve)
@@ -58,58 +52,83 @@ const MessageInput = () => {
     try {
       setFileUploadLoading(true)
       const file = e.target.files[0]
-      const reader = new FileReader();
+      // const reader = new FileReader();
+      // reader.onload = async (event) => {
+      //   const base64Data = await event.target.result.split(",")[1];
+      //   // console.log({ base64Data });
+      //   const fileMetaData = {
+      //     name: file.name,
+      //     size: file.size.toString(),
+      //     fileDataURL: base64Data,
+      //     type: file.type,
+      //   }
+      //   setFileMetaInfo(fileMetaData)
+      //   const uploadPhoto = await uploadFile({ fileMetaData, id: chatSelectedData.id })
+      //   if (uploadPhoto.data) {
+      //     console.log('uploaded')
+      //     setFileUrl({
+      //       path: uploadPhoto.data.file_path,
+      //       type: uploadPhoto.data.type
+      //     })
+      //     setFileUploadLoading(false)
+      //   } else {
+      //     console.log({ err: uploadPhoto.error })
+      //   }
+      // }
 
-      reader.onload = async (event) => {
-        const base64Data = await event.target.result.split(",")[1];
-        // console.log({ base64Data });
-        const fileMetaData = {
-          name: file.name,
-          size: file.size.toString(),
-          fileDataURL: base64Data,
-          type: file.type,
-        }
-        setFileMetaInfo(fileMetaData)
-        const uploadPhoto = await uploadFile({ fileMetaData, id: chatSelectedData.id })
-        if (uploadPhoto.data) {
-          console.log('uploaded')
-          setFileUrl({
-            path: uploadPhoto.data.file_path,
-            type: uploadPhoto.data.type
-          })
-          setFileUploadLoading(false)
-        } else {
-          console.log({ err: uploadPhoto.error })
+      // reader.readAsDataURL(file);
+
+      if (file) {
+        const fileData = new FormData();
+        fileData.append('file', file);
+        try {
+          const result = await uploadFile({ id: chatSelectedData.id, fileData }).unwrap();
+          if (result.file_path) {
+            console.log({ result: result })
+            setFileMetaInfo({
+              path: result.file_path,
+              type: result.type,
+              name: result.fileName,
+              size: result.size
+            })
+            setFileUploadLoading(false)
+            // alert('File uploaded successfully!');
+          }
+        } catch (err) {
+          console.error('Failed to upload the file: ', err);
+          // alert('Failed to upload the file');
         }
       }
-
-      reader.readAsDataURL(file);
-      handleClearAttachedFile()
       handleUpload()
     } catch (error) {
       handleUpload()
     }
   };
-
+  // console.log({fileUrl})
   const handleClearAttachedFile = () => {
-    setFileUrl({
-      path: null,
-      type: null
+    setFileMetaInfo({
+      name: "",
+      size: "",
+      path: "",
+      type: ""
     })
   }
 
   const onSubmit = async (data) => {
     try {
-      const result = await sendMessage({ message: data.message, fileUrl, id: chatSelectedData.id })
+      const result = await sendMessage({
+        message: data.message,
+        fileUrl: {
+          path: fileMetaInfo.path,
+          type: fileMetaInfo.type
+        }, 
+        id: chatSelectedData.id
+      })
       if (result.data) {
-        setFileUrl({
-          path: null,
-          type: null
-        })
         setFileMetaInfo({
           name: "",
           size: "",
-          fileDataURL: "",
+          path: "",
           type: ""
         })
         reset()
@@ -120,7 +139,7 @@ const MessageInput = () => {
       console.log({ error })
     }
   }
-  console.log({fileUploadLoading})
+  console.log({ fileUploadLoading })
 
   return (
 
@@ -175,13 +194,11 @@ const MessageInput = () => {
         {fileMetaInfo.name && (
           <div className='p-1 flex w-[250px] gap-2 bg-white rounded-md my-2 mx-10 border border-gray-600 relative'>
             <div className='flex items-center'>
-              {/* Replace FileFormatRead with your actual function/component to display file format icon */}
-              {FileFormatRead(fileMetaInfo)}
+              {FileFormatRead(fileMetaInfo.type)}
             </div>
             <div className='flex-1 min-w-0'>
               <p className='truncate font-bold'>{fileMetaInfo.name}</p>
               <p className='truncate text-start font-bold mt-1'>
-                {/* Replace formatFileSize with your actual function to format file size */}
                 {formatFileSize(fileMetaInfo.size)}
               </p>
             </div>
@@ -197,8 +214,6 @@ const MessageInput = () => {
           <button onClick={handleUpload} className='absolute mx-2 inset-y-0 start-0 flex items-center   text-black hover:opacity-50'>
             <IoIosAdd className='w-10 h-10 font-black' />
           </button>
-
-
           <form onSubmit={handleSubmit(onSubmit)} >
             <input
               type="text"
@@ -209,8 +224,8 @@ const MessageInput = () => {
             />
             <button
               type='submit'
-              className={`absolute inset-y-0 end-0 flex items-center pe-3 text-gray-800 hover:opacity-50 ${!message || fileMetaInfo.name && "opacity-40" }`}
-              disabled={!message && !fileMetaInfo.name }
+              className={`absolute inset-y-0 end-0 flex items-center pe-3 text-gray-800 hover:opacity-50 ${!message || fileMetaInfo.name && "opacity-40"}`}
+              disabled={!message && !fileMetaInfo.name}
             >
               <IoIosSend className='w-6 h-6' />
             </button>
@@ -218,7 +233,6 @@ const MessageInput = () => {
         </div>
       </div>
     </div>
-
   )
 }
 
