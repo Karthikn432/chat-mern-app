@@ -69,9 +69,9 @@ export const login = async (req, res) => {
         const { username, password } = req.body;
         const user = await User.findOne({ username });
         const isPasswordCorrect = await bcrypt.compare(password, user?.password || "")
-
+        console.log({user, isPasswordCorrect})
         if (!user || !isPasswordCorrect) {
-            res.status(400).json({
+            return res.status(400).json({
                 success: false, "errors": [
                     {
                         "name": "password",
@@ -80,9 +80,9 @@ export const login = async (req, res) => {
                 ]
             })
         }
-        generateTokenAndSetCookie(user._id, res);
+        await generateTokenAndSetCookie(user._id, res);
 
-        res.status(200).json({
+        return res.status(200).json({
             _id: user._id,
             fullName: user.fullName,
             username: user.username,

@@ -1,6 +1,7 @@
 import { useState, createContext, useEffect, useContext } from "react";
 import { useAuthContext } from "./AuthContext";
 import { io } from "socket.io-client";
+import { routesApi } from "../routes/RoutePath";
 
 
 const SocketContext = createContext();
@@ -17,7 +18,7 @@ export const SocetContextProvider = ({ children }) => {
 
     useEffect(() => { // http://localhost:5000  
         if (authUser) {
-            const socket = io("https://chat-mern-app-1lgm.onrender.com", {
+            const socket = io(routesApi.root, {
                 query: {
                     userId: authUser._id
                 }
