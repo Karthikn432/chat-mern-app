@@ -3,11 +3,13 @@ import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
 import fs from 'fs'
+import { upload } from "../middlewares/multerUpload.js";
 const __dirname = path.resolve()
 
 export const sendMessage = async (req, res) => {
     try {
         const { message, fileUrl } = req.body;
+        console.log({fileUrl})
         const { id: receiverId } = req.params;
         const senderId = req.user._id;
         let conversation = await Conversation.findOne({
@@ -35,7 +37,7 @@ export const sendMessage = async (req, res) => {
 
         const newMessage = new Message(newMessageData);
 
-        console.log({newMessage})
+        console.log({ newMessage })
         if (newMessage) {
             conversation.messages.push(newMessage._id)
         }
@@ -103,33 +105,56 @@ export const getLastMessageTime = async (req, res) => {
 
 export const uploadFiles = async (req, res, next) => {
     try {
-        const { id: uploaderId } = await req.params;
-        const { fileMetaData } = await req.body;
-        console.log({fileMetaData})
-        if (fileMetaData.fileDataURL) {
-            console.log('file')
-            const fileExtension = path.extname(fileMetaData.name);
-            const uniqueFileName = `${Date.now()}-${Math.floor(Math.random() * 1000)}${fileExtension}`;
-            const filePath = path.join(__dirname, 'chatApp-backend', 'uploads', uploaderId, uniqueFileName);
-            console.log({ filePath })
-            if (!fs.existsSync(path.dirname(filePath))) {
-                fs.mkdirSync(path.dirname(filePath), { recursive: true });
-            }
-
-            // Decode the base64 content using the appropriate encoding (e.g., 'base64')
-            const decodedContent = Buffer.from(fileMetaData.fileDataURL, 'base64');
-            // Write the file to the server
-            fs.writeFileSync(filePath, decodedContent);
-
-            return res.status(201).json({
-                success: true,
-                file_path: `uploads/${uploaderId}/` + uniqueFileName,
-                type : fileMetaData.type,
-                message: "uploaded successfully",
+        const {id} = req.params;
+        if(!id){
+            return res.status(400).json({
+                success: false,
+                message: 'SenderId is Missing'
             });
         }
+        await new Promise((resolve, reject) => {
+            upload(req, res, (err) => {
+                if (err) {
+                    if (err.code === 'LIMIT_FILE_SIZE') {
+                        return res.status(400).json({
+                            success: false,
+                            message: 'File size exceeds the maximum limit of 30MB.'
+                        });
+                    }
+                    return res.status(500).json({
+                        success: false,
+                        message: 'An error occurred during the file upload process.',
+                        error: err.message
+                    });
+                }
+                resolve();
+            });
+        });
+
+        const { file } = req;
+        console.log({file})
+        if (!file) {
+            return res.status(400).json({
+                success: false,
+                message: 'No file uploaded.'
+            });
+        }
+
+        return res.status(201).json({
+            success: true,
+            file_path: `/uploads/${id}/${file.filename}`,
+            type: file.mimetype,
+            size : file.size,
+            fileName : file.originalname,
+            message: 'Uploaded successfully',
+        });
     } catch (error) {
-        console.log({ error })
+        console.log({ error });
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred during the file upload process.',
+            error: error.message
+        });
     }
     // if (file) {
     //     const fileExtension = path.extname(fileMetaData.name);
