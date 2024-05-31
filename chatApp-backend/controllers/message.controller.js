@@ -8,8 +8,8 @@ const __dirname = path.resolve()
 
 export const sendMessage = async (req, res) => {
     try {
-        const { message, fileUrl } = req.body;
-        console.log({fileUrl})
+        const { message, fileUrl, repliedTo } = req.body;
+        console.log({ fileUrl })
         const { id: receiverId } = req.params;
         const senderId = req.user._id;
         let conversation = await Conversation.findOne({
@@ -31,9 +31,15 @@ export const sendMessage = async (req, res) => {
         if (fileUrl.path) {
             newMessageData.filepath = {
                 path: fileUrl.path,
-                type: fileUrl.type
+                type: fileUrl.type,
+                name: fileUrl.name
             };
         }
+
+        if (repliedTo) {
+            newMessageData.repliedTo = repliedTo;
+        }
+
 
         const newMessage = new Message(newMessageData);
 
@@ -67,7 +73,13 @@ export const getMessage = async (req, res) => {
         const senderId = req.user._id;
         const conversation = await Conversation.findOne({
             participants: { $all: [senderId, userToChatId] }
-        }).populate("messages"); //Not Reference But actual Messages
+        }).populate({
+            path: "messages",
+            populate: {
+                path: "repliedTo",
+                model: "Message"
+            }
+        }); //Not Reference But actual Messages
 
         if (!conversation) {
             return res.status(200).json([])
@@ -77,6 +89,79 @@ export const getMessage = async (req, res) => {
     } catch (error) {
         console.log("Error in message controller", error.message);
         res.status(500).json({ error: "Internal Server Error" })
+    }
+}
+
+export const editMessage = async (req, res) => {
+    try {
+        const { id: messageId } = req.params;
+        const { message, fileUrl } = req.body;
+        const senderId = req.user._id;
+
+        const messageToEdit = await Message.findOne({ _id: messageId, senderId });
+
+        if (!messageToEdit) {
+            return res.status(404).json({ error: "Message not found or you're not authorized to edit this message" });
+        }
+
+        if (message) {
+            messageToEdit.message = message;
+        }
+
+        if (fileUrl && fileUrl.path) {
+            messageToEdit.filepath = {
+                path: fileUrl.path,
+                type: fileUrl.type,
+                name: fileUrl.name
+            };
+        }
+
+        messageToEdit.editedAt = new Date();
+
+        await messageToEdit.save();
+
+        // SOCKET IO Functionality to notify about the edited message
+        const receiverSocketId = getReceiverSocketId(messageToEdit.receiverId);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("editedMessage", messageToEdit);
+        }
+
+        res.status(200).json(messageToEdit);
+
+    } catch (error) {
+        console.log("Error in message controller", error.message);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+export const deleteMessage = async (req, res) => {
+    try {
+        const { id: messageId } = req.params;
+        const senderId = req.user._id;
+
+        const messageToDelete = await Message.findOneAndDelete({ _id: messageId, senderId });
+
+        if (!messageToDelete) {
+            return res.status(404).json({ error: "Message not found or you're not authorized to delete this message" });
+        }
+
+        // Remove message reference from the conversation
+        await Conversation.updateOne(
+            { participants: { $all: [senderId, messageToDelete.receiverId] } },
+            { $pull: { messages: messageId } }
+        );
+
+        // SOCKET IO Functionality to notify about the deleted message
+        const receiverSocketId = getReceiverSocketId(messageToDelete.receiverId);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("deletedMessage", messageId);
+        }
+
+        res.status(200).json({ message: "Message deleted successfully" });
+
+    } catch (error) {
+        console.log("Error in message controller", error.message);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 }
 
@@ -105,8 +190,8 @@ export const getLastMessageTime = async (req, res) => {
 
 export const uploadFiles = async (req, res, next) => {
     try {
-        const {id} = req.params;
-        if(!id){
+        const { id } = req.params;
+        if (!id) {
             return res.status(400).json({
                 success: false,
                 message: 'SenderId is Missing'
@@ -132,7 +217,7 @@ export const uploadFiles = async (req, res, next) => {
         });
 
         const { file } = req;
-        console.log({file})
+        console.log({ file })
         if (!file) {
             return res.status(400).json({
                 success: false,
@@ -144,8 +229,8 @@ export const uploadFiles = async (req, res, next) => {
             success: true,
             file_path: `/uploads/${id}/${file.filename}`,
             type: file.mimetype,
-            size : file.size,
-            fileName : file.originalname,
+            size: file.size,
+            fileName: file.originalname,
             message: 'Uploaded successfully',
         });
     } catch (error) {

@@ -6,17 +6,17 @@ const FileFormatRead = (type) => {
     switch (fileType) {
 
         case 'image':
-            return <IoImage className='w-10 h-14 text-red-500' />;
+            return <IoImage className='w-6 h-8 text-red-500' />;
         case 'video':
-            return <IoPlay className='w-10 h-14 text-red-500 ' />;
+            return <IoPlay className='w-6 h-8 text-red-500 ' />;
         case 'audio':
-            return <IoMusicalNote className='w-10 h-14 text-red-500' />;
+            return <IoMusicalNote className='w-6 h-8 text-red-500' />;
         case 'application':
             return <IoDocumentText className='w-10 h-10 text-gray-600' />;;
         case 'text':
-            return <IoDocumentText className='w-10 h-14 text-red-300' />;
+            return <IoDocumentText className='w-6 h-8 text-red-300' />;
         default:
-            return <IoImage className='w-10 h-14 text-red-500' />;
+            return <IoImage className='w-6 h-8 text-red-500' />;
     }
 };
 

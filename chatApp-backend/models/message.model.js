@@ -16,27 +16,42 @@ const messageSchema = new mongoose.Schema({
     message: {
         type: String,
     },
-    
+
     filepath: {
         path: {
             type: String,
         },
         type: {
             type: String,
+        },
+        name: {
+            type: String,
         }
+    },
+
+    repliedTo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message",
+        default: null
+    },
+
+    editedAt: {
+        type: Date,
+        default: null
     }
+
 },
-    { 
-        timestamps: true 
+    {
+        timestamps: true
     }
 );
 
 // Custom validator to ensure either 'message' or 'filepath' is provided
-messageSchema.path('message').validate(function(value) {
+messageSchema.path('message').validate(function (value) {
     return value || (this.filepath && this.filepath.path);
 }, 'Either message or filepath must be provided.');
 
-messageSchema.path('filepath.path').validate(function(value) {
+messageSchema.path('filepath.path').validate(function (value) {
     return value || this.message;
 }, 'Either message or filepath must be provided.');
 

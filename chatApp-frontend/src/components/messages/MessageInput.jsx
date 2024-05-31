@@ -1,16 +1,22 @@
 import { IoIosAdd, IoIosAttach, IoIosSend, IoMdImage, IoMdVideocam } from 'react-icons/io'
 import { useSendMessageMutation, useFileUploadMutation } from '../../features/rtkquery/app-query/usersQuery';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { useEffect, useState } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
 import { useRef } from 'react';
 import FileFormatRead from './FileFormatRead';
-import { formatFileSize } from '../../utils/utils';
+import { extractTime, formatFileSize } from '../../utils/utils';
 import { LoadingProgressBar } from '../LoadingProgressBar';
+import { IoClose } from 'react-icons/io5';
+import { resetSelectedMsg } from '../../features/slice/selectedChatSlice';
 
 const MessageInput = () => {
   const chatSelectedData = useSelector(state => state.chatContactsData);
+  const selectedMsgData = useSelector(state => state.selectedMsgData);
+  // const editMsgData = useSelector(state => state.editMsgData);
+  // console.log({editMsgData})
+  const dispatch = useDispatch()
   const { authUser } = useAuthContext()
   const { handleSubmit, formState: { errors }, register, reset, watch } = useForm();
   const message = watch('message', '');
@@ -114,17 +120,24 @@ const MessageInput = () => {
     })
   }
 
+  const handleClearSeletedChat = () => {
+    dispatch(resetSelectedMsg())
+  }
+
   const onSubmit = async (data) => {
     try {
       const result = await sendMessage({
         message: data.message,
         fileUrl: {
           path: fileMetaInfo.path,
-          type: fileMetaInfo.type
-        }, 
-        id: chatSelectedData.id
+          type: fileMetaInfo.type,
+          name: fileMetaInfo.name
+        },
+        id: chatSelectedData.id,
+        repliedTo: selectedMsgData?._id
       })
       if (result.data) {
+        dispatch(resetSelectedMsg())
         setFileMetaInfo({
           name: "",
           size: "",
@@ -139,35 +152,11 @@ const MessageInput = () => {
       console.log({ error })
     }
   }
-  console.log({ fileUploadLoading })
+  console.log({ authUser })
 
   return (
 
     <div className="px-8 md:px-16 lg:px-32 xl:px-64 my-3 ">
-
-      {/* {
-        fileMetaInfo.name !== "" && (
-          <div className='p-1 flex gap-2 bg-white w-56 my-2 rounded-md mt-2 '>
-            <div className='flex items-center'>
-              {FileFormatRead(fileMetaInfo)}
-            </div>
-            <div className='flex-1 min-w-0 '>
-              <p className='truncate font-bold'>{fileMetaInfo.name}</p>
-              <p className='truncate text-start font-bold mt-1'>{formatFileSize(fileMetaInfo.size)}
-               <span className='font-bold opacity-70'>size</span> 
-              </p>
-            </div>
-            {
-              fileUploadLoading && <LoadingProgressBar />
-            }
-          </div>
-        )
-      } */}
-
-
-
-
-
 
       {
         isOpenFileAttach && (
@@ -210,6 +199,33 @@ const MessageInput = () => {
           </div>
         )}
 
+        {
+          selectedMsgData && (
+            <div className='p-1 w-[250px] gap-2 bg-white rounded-md my-2 mx-10 border border-gray-600 relative'>
+              <div className='flex gap-2 items-center'>
+                <p className='font-bold'>{selectedMsgData.senderId === authUser._id ? authUser.fullName : chatSelectedData.name}</p>
+                <p className='opacity-80 text-xs'>{extractTime(selectedMsgData?.createdAt)}</p>
+              </div>
+              <div className='flex items-center'>
+                <button className='absolute top-0 right-0 rounded-full hover:bg-gray-600 m-0.5' onClick={handleClearSeletedChat}>
+                  <IoClose className=' w-6 h-6 hover:text-white' />
+                </button>
+                {
+                  selectedMsgData?.filepath && (
+                    <div className='flex gap-3 items-center font-semibold'>
+                      {FileFormatRead(selectedMsgData?.filepath?.type)}
+                      <p>{selectedMsgData?.filepath?.name}</p>
+                    </div>
+                  )
+                }
+                <div>
+                  <p>{selectedMsgData?.message}</p>
+                </div>
+              </div>
+            </div>
+          )
+        }
+
         <div className="w-full relative">
           <button onClick={handleUpload} className='absolute mx-2 inset-y-0 start-0 flex items-center   text-black hover:opacity-50'>
             <IoIosAdd className='w-10 h-10 font-black' />
@@ -220,6 +236,7 @@ const MessageInput = () => {
               className={`pl-16 text-lg rounded-lg block w-full h-14 bg-gray-200 border-gray-600 text-gray-800 `}
               placeholder='Send a message'
               name='message'
+              // defaultValue={editMsgData?.message}
               {...register("message")}
             />
             <button
@@ -232,7 +249,7 @@ const MessageInput = () => {
           </form >
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 
