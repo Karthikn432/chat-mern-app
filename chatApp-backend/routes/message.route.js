@@ -8,6 +8,8 @@ router.route('/send/:id').post(protectRoute,sendMessage);
 router.route('/upload_file/:id').post(uploadFiles)
 router.route('/:id').get(protectRoute,getMessage);
 router.route('/lastseen/:id').get(protectRoute,getLastMessageTime);
+router.route('/edit/:id').patch(protectRoute,)
+router.route('/delete/:id').delete(protectRoute,)
 
 
 export default router;

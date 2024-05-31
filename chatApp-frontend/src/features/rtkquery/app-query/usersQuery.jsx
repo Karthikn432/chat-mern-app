@@ -37,12 +37,12 @@ export const usersQueryApi = rootApi.injectEndpoints({
 
         sendMessage: builder.mutation({
             query: (args) => {
-                const { id, message, fileUrl } = args;
+                const { id, message, fileUrl, repliedTo } = args;
                 console.log({message})
                 return {
                     url: `${routesApi.app.sendMessage}/${id}`,  //signin end point
                     method: "POST",
-                    body: { message, fileUrl },
+                    body: { message, fileUrl, repliedTo },
                 }
             },
             invalidatesTags: ["Messages"]
