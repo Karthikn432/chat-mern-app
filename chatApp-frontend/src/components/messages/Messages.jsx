@@ -42,7 +42,7 @@ const Messages = () => {
            {
             messages?.length ? (
                 messages?.map((chat, idx)=>(
-                    <div ref={lastMsgRef} key={idx} className='mt-8'>
+                    <div ref={lastMsgRef} key={idx} className='mt-4'>
                          <Message chat={chat} dateString={chat.createdAt} senderId={chat.senderId} shake={chat}/>
                     </div>
                    

@@ -21,10 +21,9 @@ import { app, server } from "./socket/socket.js";
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
+dotenv.config()
 // const app = express();
 const PORT = process.env.PORT || 5000
-
-dotenv.config()
 
 const __dirname = path.resolve()
 
