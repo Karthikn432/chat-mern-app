@@ -8,7 +8,6 @@ const initialState =getSelectedUser ? getSelectedUser : {
     profile : "", 
     lastMsgDate : ""
 }
-console.log({initialState})
 
 const chatSlice = createSlice({
     name:'whatsappSendContacts',

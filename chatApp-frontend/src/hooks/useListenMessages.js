@@ -1,37 +1,71 @@
-import { useEffect } from "react"
-import { useSocketContext } from "../context/SocketContext"
-import { useAuthContext } from "../context/AuthContext"
-import notificationSound from "../assets/sounds/notification.mp3"
+import { useEffect } from "react";
+import { useSocketContext } from "../context/SocketContext";
+import { useAuthContext } from "../context/AuthContext";
+import notificationSound from "../assets/sounds/notification.mp3";
+import { addNewMessage, updateUnviewedCounts } from "../features/slice/newMessageSlice";
+import { useDispatch } from "react-redux";
 
-const useListenMessages = ({ messages, setMessages }) => {
+const useListenMessages = ({ setMessages, selectedChatId }) => {
+    const { socket } = useSocketContext();
+    const { authUser } = useAuthContext();
+    const dispatch = useDispatch();
 
-  const { socket } = useSocketContext();
-  const { authUser } = useAuthContext();
+    useEffect(() => {
+        const handleNewMessage = (newMessage, isGroupChat) => {
+            console.log({ selectedChatId, isGroupChat, newMessage })
+            if (isGroupChat) {
+                if (newMessage.receiverId === selectedChatId) {
+                    dispatch(addNewMessage(newMessage));
+                    setMessages((prev) => [...prev, newMessage]);
+                    const sound = new Audio(notificationSound);
+                    sound.play();
+                } else {
+                    console.log({rid: newMessage.receiverId})
+                    dispatch(updateUnviewedCounts([{ userId: newMessage.receiverId, count: 1 }]));
+                }
+            } else {
+                if (newMessage.senderId === selectedChatId) {
+                    dispatch(addNewMessage(newMessage));
+                    setMessages((prev) => [...prev, newMessage]);
+                    const sound = new Audio(notificationSound);
+                    sound.play();
+                } else {
+                    dispatch(updateUnviewedCounts([{ userId: newMessage.senderId, count: 1 }]));
+                }
+            }
+        };
 
-  useEffect(() => {
-    socket?.on("newMessage", (newMessage) => {
-      const findSender = authUser._id === newMessage.receiverId
-      if (findSender) {
-        newMessage.shouldShake = true;
-        const sound = new Audio(notificationSound);
-        sound.play()
-      }
-      setMessages([...messages, newMessage])
-    })
+        // const handleDeletedMessage = (messageId) => {
+        //     setMessages((prevMessages) => prevMessages.filter(message => message._id !== messageId));
+        // };
 
-    return () => socket?.off("newMessage")
-  }, [socket, setMessages, messages])
-}
+        // const handleEditedMessage = (editedMessage) => {
+        //     if (editedMessage.receiverId === selectedChatId || editedMessage.senderId === selectedChatId) {
+        //         setMessages((prevMessages) =>
+        //             prevMessages.map((message) =>
+        //                 message._id === editedMessage._id ? editedMessage : message
+        //             )
+        //         );
+        //         const isReceiver = authUser._id === editedMessage.senderId;
+        //         if (isReceiver) {
+        //             const sound = new Audio(notificationSound);
+        //             sound.play();
+        //         }
+        //     }
+        // };
 
-export default useListenMessages
+        socket?.on("newMessage", handleNewMessage);
+        // socket?.on("deletedMessage", handleDeletedMessage);
+        // socket?.on("editedMessage", handleEditedMessage);
 
-// const handleNewMessage = (newMessage) => {
-//   console.log({newMessage})
-//     setMessages((prev) => [...prev, newMessage]);
-//   };
+        return () => {
+            socket?.off("newMessage", handleNewMessage);
+            // socket?.off("deletedMessage", handleDeletedMessage);
+            // socket?.off("editedMessage", handleEditedMessage);
+        };
+    }, [socket, selectedChatId, authUser, dispatch]);
 
-//   socket?.on('newMessage', handleNewMessage);
+    return null;
+};
 
-//   return () => {
-//     socket?.off('newMessage', handleNewMessage);
-//   };
+export default useListenMessages;
