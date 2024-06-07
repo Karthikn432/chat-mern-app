@@ -2,7 +2,7 @@ import { IoDocumentText, IoFileTray, IoFileTrayStacked, IoImage, IoMusicalNote, 
 import { routesApi } from '../../routes/RoutePath';
 
 const FileFormatRead = (type) => {
-    const fileType = type.split('/')[0];
+    const fileType = type?.split('/')[0];
     switch (fileType) {
 
         case 'image':

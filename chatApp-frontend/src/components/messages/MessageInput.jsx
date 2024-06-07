@@ -10,195 +10,77 @@ import { extractTime, formatFileSize } from '../../utils/utils';
 import { LoadingProgressBar } from '../LoadingProgressBar';
 import { IoClose } from 'react-icons/io5';
 import { resetSelectedMsg } from '../../features/slice/selectedChatSlice';
+import FileUpload from './FileUpload';
+import MessageOptions from './MessageOptions';
+import { resetMessageFiles } from '../../features/slice/fileSlice';
 
 const MessageInput = () => {
   const chatSelectedData = useSelector(state => state.chatContactsData);
   const selectedMsgData = useSelector(state => state.selectedMsgData);
-  // const editMsgData = useSelector(state => state.editMsgData);
-  // console.log({editMsgData})
+  const messageFilesData = useSelector(state => state.filesData);
+  const [fileMetaInfo, setFileMetaInfo] = useState(messageFilesData?.messageFiles)
+  const [fileUploadLoading, setFileUploadLoading] = useState(false)
+  const fileAttachRef = useRef(null);
   const dispatch = useDispatch()
   const { authUser } = useAuthContext()
-  const { handleSubmit, formState: { errors }, register, reset, watch } = useForm();
+  const { handleSubmit, formState: { errors }, register, reset, watch, setError } = useForm();
   const message = watch('message', '');
-  const [fileMetaInfo, setFileMetaInfo] = useState({
-    name: "",
-    size: "",
-    path: "",
-    type: ""
-  })
+
   const [sendMessage, { error, isLoading, isSuccess }] = useSendMessageMutation();
-  const [uploadFile] = useFileUploadMutation()
-  const [fileUploadLoading, setFileUploadLoading] = useState(false)
-  const [isOpenFileAttach, setIsOpenFileAttach] = useState(false)
-  const fileAttachRef = useRef(null);
-
-  const handleUpload = () => {
-    setIsOpenFileAttach(preve => !preve)
-  }
-
-  const handleClickOutside = (event) => {
-    if (fileAttachRef.current && !fileAttachRef.current.contains(event.target)) {
-      setIsOpenFileAttach(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isOpenFileAttach) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpenFileAttach]);
-
-
-  const handleAttachFile = async (e) => {
-    try {
-      setFileUploadLoading(true)
-      const file = e.target.files[0]
-      // const reader = new FileReader();
-      // reader.onload = async (event) => {
-      //   const base64Data = await event.target.result.split(",")[1];
-      //   // console.log({ base64Data });
-      //   const fileMetaData = {
-      //     name: file.name,
-      //     size: file.size.toString(),
-      //     fileDataURL: base64Data,
-      //     type: file.type,
-      //   }
-      //   setFileMetaInfo(fileMetaData)
-      //   const uploadPhoto = await uploadFile({ fileMetaData, id: chatSelectedData.id })
-      //   if (uploadPhoto.data) {
-      //     console.log('uploaded')
-      //     setFileUrl({
-      //       path: uploadPhoto.data.file_path,
-      //       type: uploadPhoto.data.type
-      //     })
-      //     setFileUploadLoading(false)
-      //   } else {
-      //     console.log({ err: uploadPhoto.error })
-      //   }
-      // }
-
-      // reader.readAsDataURL(file);
-
-      if (file) {
-        const fileData = new FormData();
-        fileData.append('file', file);
-        try {
-          const result = await uploadFile({ id: chatSelectedData.id, fileData }).unwrap();
-          if (result.file_path) {
-            console.log({ result: result })
-            setFileMetaInfo({
-              path: result.file_path,
-              type: result.type,
-              name: result.fileName,
-              size: result.size
-            })
-            setFileUploadLoading(false)
-            // alert('File uploaded successfully!');
-          }
-        } catch (err) {
-          console.error('Failed to upload the file: ', err);
-          // alert('Failed to upload the file');
-        }
-      }
-      handleUpload()
-    } catch (error) {
-      handleUpload()
-    }
-  };
-  // console.log({fileUrl})
-  const handleClearAttachedFile = () => {
-    setFileMetaInfo({
-      name: "",
-      size: "",
-      path: "",
-      type: ""
-    })
-  }
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
   const handleClearSeletedChat = () => {
     dispatch(resetSelectedMsg())
   }
 
-  const onSubmit = async (data) => {
-    try {
-      const result = await sendMessage({
-        message: data.message,
-        fileUrl: {
-          path: fileMetaInfo.path,
-          type: fileMetaInfo.type,
-          name: fileMetaInfo.name
-        },
-        id: chatSelectedData.id,
-        repliedTo: selectedMsgData?._id
-      })
-      if (result.data) {
-        dispatch(resetSelectedMsg())
-        setFileMetaInfo({
-          name: "",
-          size: "",
-          path: "",
-          type: ""
-        })
-        reset()
-      } else {
-        console.log({ error: result.error })
-      }
-    } catch (error) {
-      console.log({ error })
+  useEffect(() => {
+    if (messageFilesData?.messageFiles) {
+      setFileMetaInfo(messageFilesData?.messageFiles)
     }
-  }
-  console.log({ authUser })
+  }, [messageFilesData])
+  const onSubmit = async (data) => {
+    if (isSubmitted) return;
+    setIsSubmitted(true);
+    try {
+      if (data?.message || (fileMetaInfo && fileMetaInfo.length > 0)) {
+        console.log('input filed')
+        const result = await sendMessage({
+          message: data.message,
+          fileUrls: fileMetaInfo.map(file => ({
+            path: file.path,
+            type: file.type,
+            name: file.name,
+            size: file.size
+          })),
+          id: chatSelectedData.id,
+          repliedTo: selectedMsgData?._id
+        });
+
+        if (result.data) {
+          await dispatch(resetSelectedMsg());
+          await dispatch(resetMessageFiles())
+          reset();
+        } else {
+          console.log({ error: result.error });
+        }
+      }
+      else {
+        console.log('errors')
+        setError("message", { type: "message", message: "Please Enter Message" })
+      }
+
+    } catch (error) {
+      console.log({ error });
+    } finally {
+      setIsSubmitted(false);
+    }
+  };
+
 
   return (
 
-    <div className="px-8 md:px-16 lg:px-32 xl:px-64 my-3 ">
-
-      {
-        isOpenFileAttach && (
-          <div className='bg-black border-2 border-gray-600 hover:bg-gray-500 text-white shadow rounded absolute bottom-14 w-40 p-2 opacity-75 my-5' ref={fileAttachRef}>
-            <form>
-              <label htmlFor='uploadImage' className='flex items-center  px-3 py-0.3 gap-1  cursor-pointer' >
-                <div className='text-secondary'>
-                  <IoIosAttach className='w-6 h-6 font-black' />
-                </div>
-                <p>Attach File</p>
-              </label>
-
-              <input
-                type='file'
-                id='uploadImage'
-                onChange={handleAttachFile}
-                className='hidden'
-              />
-            </form>
-          </div>
-        )
-      }
-      <div className={`border text-sm rounded-lg block w-full  bg-gray-200 border-gray-600 text-gray-800 `} >
-        {fileMetaInfo.name && (
-          <div className='p-1 flex w-[250px] gap-2 bg-white rounded-md my-2 mx-10 border border-gray-600 relative'>
-            <div className='flex items-center'>
-              {FileFormatRead(fileMetaInfo.type)}
-            </div>
-            <div className='flex-1 min-w-0'>
-              <p className='truncate font-bold'>{fileMetaInfo.name}</p>
-              <p className='truncate text-start font-bold mt-1'>
-                {formatFileSize(fileMetaInfo.size)}
-              </p>
-            </div>
-            {fileUploadLoading && (
-              <div className='w-full absolute bottom-0 left-0 p-0.4'>
-                <LoadingProgressBar />
-              </div>
-            )}
-          </div>
-        )}
-
+    <div className="px-8 md:px-16 lg:px-32 xl:px-64 my-3 relative ">
+      <div className={`border text-sm rounded-lg block w-full  bg-gray-200 border-gray-600 text-gray-800 relative `} >
         {
           selectedMsgData && (
             <div className='p-1 w-[250px] gap-2 bg-white rounded-md my-2 mx-10 border border-gray-600 relative'>
@@ -226,10 +108,42 @@ const MessageInput = () => {
           )
         }
 
-        <div className="w-full relative">
-          <button onClick={handleUpload} className='absolute mx-2 inset-y-0 start-0 flex items-center   text-black hover:opacity-50'>
-            <IoIosAdd className='w-10 h-10 font-black' />
-          </button>
+        {
+          errors["message"] && (
+            <p className="text-gray-700 font-bold tracking-wider text-xs rounded-t-md py-2 bg-gray-400 text-start ps-5 p-1">{errors["message"].message}</p>
+          )
+        }
+
+        <div className="w-full relative z-0">
+          {fileMetaInfo &&
+            fileMetaInfo?.map((file, idx) => (
+              <div key={idx} className='p-1 flex w-[250px] gap-2 bg-white rounded-md my-2 mx-10 border border-gray-600 relative'>
+                <div className='flex items-center'>
+                  {FileFormatRead(file.type)}
+                </div>
+                <div className='flex-1 min-w-0'>
+                  <p className='truncate font-bold'>{file.name}</p>
+                  <p className='truncate text-start font-bold mt-1'>
+                    {formatFileSize(file.size)}
+                  </p>
+                </div>
+                {fileUploadLoading && (
+                  <div className='w-full absolute bottom-0 left-0 p-0.4'>
+                    <LoadingProgressBar />
+                  </div>
+                )}
+              </div>
+            ))
+          }
+          <FileUpload
+            setFileUploadLoading={setFileUploadLoading}
+            fileAttachRef={fileAttachRef}
+            isEditClick={false}
+            context="message"
+          />
+
+
+
           <form onSubmit={handleSubmit(onSubmit)} >
             <input
               type="text"
@@ -241,12 +155,13 @@ const MessageInput = () => {
             />
             <button
               type='submit'
-              className={`absolute inset-y-0 end-0 flex items-center pe-3 text-gray-800 hover:opacity-50 ${!message || fileMetaInfo.name && "opacity-40"}`}
-              disabled={!message && !fileMetaInfo.name}
+              className={`absolute end-0 bottom-3 flex items-center pe-3 text-gray-800 hover:opacity-50 ${!message || fileMetaInfo.name && "opacity-40"}`}
+              disabled={!message && !fileMetaInfo.name && isSubmitted}
             >
               <IoIosSend className='w-6 h-6' />
             </button>
           </form >
+
         </div>
       </div>
     </div >

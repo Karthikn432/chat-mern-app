@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { routesApi } from '../../routes/RoutePath';
 import FileFormatRead from './FileFormatRead';
 
-const RenderFileContent = (filepath) => {
-    const fetchPath = routesApi.app.getFilesFromServer; //"https://chat-mern-app-1lgm.onrender.com/api"// "http://localhost:5000/api" //
+const RenderFileContent = ({ filepath }) => { // Correctly destructuring props
+    const fetchPath = routesApi.app.getFilesFromServer; 
     if (!filepath?.type) return null;
 
     const { path, type } = filepath;
@@ -39,9 +39,9 @@ const RenderFileContent = (filepath) => {
                 return <audio src={`${fetchPath}${path}`} controls className="min-h-12 w-56 md:w-60 lg:w-72 object-fit" />;
             case 'application':
                 return (
-                    <a src={`${fetchPath}${path}`} target="_blank" rel="noopener noreferrer truncate flex w-full" className="text-black">
+                    <a href={`${fetchPath}${path}`} target="_blank" rel="noopener noreferrer truncate flex w-full" className="text-black">
                         <p className='flex justify-center items-center gap-2'>
-                            <span>{FileFormatRead(type)}</span> <span>Download Excel File</span>
+                            <span>{FileFormatRead(type)}</span> <span>Download File</span>
                         </p>
                     </a>
                 );

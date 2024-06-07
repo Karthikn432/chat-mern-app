@@ -7,7 +7,7 @@ import FileFormatRead from './FileFormatRead';
 const RepliedMsgFormat = ({ chat, bubbleBgColor, shakeClass }) => {
     const { authUser } = useAuthContext();
     const chatSelectedData = useSelector(state => state.chatContactsData)
-    console.log({ chat })
+
     return (
         <>
             <div className={`chat-bubble min-w-full text-black bg-blue-200  ${bubbleBgColor} ${shakeClass}`}>
