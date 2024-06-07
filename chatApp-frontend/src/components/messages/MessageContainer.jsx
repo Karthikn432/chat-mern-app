@@ -15,7 +15,7 @@ const MessageContainer = () => {
         await dispatch(resetSelectedChatUser())
     }
     return (
-        <div className="flex flex-col justify-center w-full h-screen">
+        <main className="flex flex-col justify-center w-full h-screen m-auto">
             {
                 !chatContactsData.id ? (<NoChatSelected />) : (
                     <>
@@ -36,7 +36,7 @@ const MessageContainer = () => {
                     </>
                 )
         }
-        </div>
+        </main>
     )
 }
 

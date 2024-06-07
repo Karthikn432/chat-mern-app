@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import Message from "../models/message.model.js";
 
 export const getUsersForSidebars = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -7,6 +8,7 @@ export const getUsersForSidebars = async (req, res) => {
 
     try {
         const loggedInUserId = req.user._id
+        console.log({loggedInUserId})
         const query = { _id: { $ne: loggedInUserId } };
         if (searchTerm) {
             // Use a case-insensitive regular expression for searching names
@@ -16,13 +18,31 @@ export const getUsersForSidebars = async (req, res) => {
         const pageCount = Math.ceil(totalCount / perPage);
 
         const filteredUsers = await User.find(query).select("-password")
+
+        const userWithUnviewedCount = await Promise.all(
+            filteredUsers.map(async (user) => {
+                const unviewedCount = await Message.countDocuments({
+                    receiverId: loggedInUserId,
+                    senderId: user._id,
+                    viewed: false,
+                });
+                return {
+                    ...user.toObject(),
+                    unviewedCount,
+                };
+            })
+        );
+        console.log('getUsersForSidebars')
+        console.log({userWithUnviewedCount})
         const respose = {
             page,
             per_page: perPage,
             total_pages: pageCount,
             total_records: totalCount,
-            filteredUsers
+            // filteredUsers : userWithUnviewedCount
+            // unReadMessageCount : 
         }
+        console.log({respose})
         res.status(200).json(respose)
 
     } catch (error) {

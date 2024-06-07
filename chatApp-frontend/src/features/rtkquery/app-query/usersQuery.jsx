@@ -37,12 +37,12 @@ export const usersQueryApi = rootApi.injectEndpoints({
 
         sendMessage: builder.mutation({
             query: (args) => {
-                const { id, message, fileUrl, repliedTo } = args;
-                console.log({message})
+                const { id, message, fileUrls, repliedTo } = args;
+                console.log({fileUrls})
                 return {
                     url: `${routesApi.app.sendMessage}/${id}`,  //signin end point
                     method: "POST",
-                    body: { message, fileUrl, repliedTo },
+                    body: { message, fileUrls, repliedTo },
                 }
             },
             invalidatesTags: ["Messages"]
@@ -61,6 +61,47 @@ export const usersQueryApi = rootApi.injectEndpoints({
             invalidatesTags: ['Messages'],
         }),
         
+        editMessage : builder.mutation({
+            query: (args) => {
+                const { id, message, fileUrls } = args;
+                console.log({message})
+                return {
+                    url: `${routesApi.app.editMessage}/${id}`,  //signin end point
+                    method: "PATCH",
+                    body: { message, fileUrls },
+                }
+            },
+            invalidatesTags: ["Messages"]
+        }),
+
+        deleteMessage : builder.mutation({
+            query: ({id}) => {
+                return {
+                    url: `${routesApi.app.deleteMessage}/${id}`,  //signin end point
+                    method: "DELETE",
+                }
+            },
+            invalidatesTags: ["Messages"]
+        }),
+
+        unreadMssages : builder.query({
+            query: (id) => {
+                return {
+                    url: `${routesApi.app.unread}/${id}`,  //userGeneratePasword end point
+                    method: "GET",
+                }
+            },
+        }),
+
+        setAsReadMessages : builder.mutation({
+            query: ({messageIds}) => {
+                return {
+                    url: routesApi.app.markMessagesAsViewed,
+                    method: "POST",
+                    body: {messageIds}
+                }
+            },
+        })
 
     })
 })
@@ -71,4 +112,9 @@ export const {
     useLazyGetSelectedUserMessagesQuery,
     useSendMessageMutation,
     useGetLastMessageTimeQuery,
-    useFileUploadMutation } = usersQueryApi;
+    useFileUploadMutation,
+    useEditMessageMutation,
+    useDeleteMessageMutation,
+    useUnreadMssagesQuery,
+    useSetAsReadMessagesMutation
+} = usersQueryApi;

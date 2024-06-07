@@ -1,5 +1,5 @@
 const base = "/";
-const baseApiRoot = "https://chat-mern-app-1lgm.onrender.com" //   "http://localhost:5000" //   
+const baseApiRoot = "https://chat-mern-app-1lgm.onrender.com" //    "http://localhost:5000" //   
 const baseApi = baseApiRoot + "/api";
 const app = "/app";
 
@@ -31,7 +31,12 @@ export const routesApi = {
    getMessages : baseApi + "/messages",
    sendMessage : baseApi + "/messages/send",
    uploadFile : baseApi + "/messages/upload_file",
+   editMessage : baseApi + "/messages/edit",
+   deleteMessage : baseApi + "/messages/delete",
    getLastMessageTime : baseApi + "/messages/lastseen",
-   getFilesFromServer : baseApi
+   getFilesFromServer : baseApi,
+   createGroupChat : baseApi + "/groupchat/create-new-group",
+   unread : baseApi + "/messages/unread",
+   markMessagesAsViewed : baseApi + "/messages/markMessagesAsViewed"
   }
 };

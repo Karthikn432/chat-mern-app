@@ -3,7 +3,6 @@ import { createSlice } from "@reduxjs/toolkit"
 const getSelectedMsg = JSON.parse(localStorage.getItem("selected_msg"))
 
 const initialState =getSelectedMsg ? getSelectedMsg : ''
-console.log({initialState})
 
 const selectedMsgSlice = createSlice({
     name:'selectedMsg',
